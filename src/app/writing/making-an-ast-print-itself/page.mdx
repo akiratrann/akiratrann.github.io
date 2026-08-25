@@ -1,0 +1,42 @@
+export const metadata = {
+  title: "Making an AST print itself",
+  description:
+    "Notes on adding debugging output to twenty-five syntax tree structures in a pure functional compiler.",
+};
+
+<p className="text-xs text-faint">14 Feb 2026 · draft</p>
+
+# Making an AST print itself
+
+Morphic is a pure functional language. Like most compilers, it moves a program
+through a series of representations — surface syntax, an abstract syntax tree,
+an intermediate representation, and finally a target. Unlike most compilers, it
+could not tell you what any of those looked like.
+
+That sounds like a minor gap. It is not. When a transformation produces the
+wrong result and you cannot inspect the tree on either side of it, debugging
+becomes guesswork about code you did not write.
+
+## Twenty-five structures
+
+The tree is not one type. It is twenty-five of them, and they nest. Adding
+output to one is trivial; adding it to all of them consistently is the actual
+task, because the value of the output comes from being able to compare stages,
+and you cannot compare stages that print differently.
+
+The rules I settled on:
+
+- Every structure prints in a form that could plausibly be parsed back.
+- Nesting is shown by indentation, not by punctuation depth.
+- Nothing is elided by default. A debugging printer that summarises is a
+  printer you stop trusting the first time it hides the thing you needed.
+
+## What it changed
+
+The immediate effect was that the WebAssembly work became possible. Targeting,
+entry-point naming, runtime linking and the symbol table all failed in ways
+that looked identical from the outside — a compile that did not finish. With
+tree output at each stage, they separated into four distinct problems.
+
+> The general lesson is dull and keeps being true: the tool that shows you
+> intermediate state is worth more than the tool that goes faster.

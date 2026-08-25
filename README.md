@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# akiratran.com
 
-## Getting Started
+Personal site and portfolio. Next.js 16 (App Router) + Tailwind 4, statically
+generated, deployed on Vercel.
 
-First, run the development server:
+The design direction is **Diagnostic**: every project is presented in the shape
+of a compiler error message — severity word, `-->` source location, a
+highlighted span with a caret underline, and a trailing `help:` line. It borrows
+rustc's grammar specifically, because that is the code I actually work on.
+
+## Running it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev          # http://localhost:3000
+pnpm build        # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things live
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Path | What it is |
+| --- | --- |
+| `src/content/projects.ts` | Every project, including its diagnostic span. Edit here to change the work list. |
+| `src/content/cv.ts` | Résumé data — education, roles, skills, honours. |
+| `src/content/posts.ts` | Post index (title, date, summary, draft flag). |
+| `src/app/writing/<slug>/page.mdx` | The posts themselves. |
+| `src/components/Diagnostic.tsx` | Renders one project as a compiler diagnostic. |
+| `src/app/globals.css` | Design tokens — palette, fonts, focus styles. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Adding a project
 
-## Learn More
+Append an entry to `projects` in `src/content/projects.ts`. The detail page and
+its static route are generated from the list; nothing else needs touching.
 
-To learn more about Next.js, take a look at the following resources:
+The `span` field is the highlighted source line. `underline` must line up with
+`code` character-for-character — spaces to the token, then carets across it:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+code:      'verdict = classify(skill.deps, binaries=True)'
+underline: '          ^^^^^^^^'
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Set `featured: true` to surface it on the home page.
 
-## Deploy on Vercel
+## Adding a post
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Create `src/app/writing/<slug>/page.mdx`.
+2. Add a matching entry to `posts` in `src/content/posts.ts`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Drafts (`draft: true`) are visible in `pnpm dev` and hidden in production.
+
+## Deploying
+
+The site has no server-side dependencies — it builds to static output.
+
+```bash
+pnpm dlx vercel
+```
+
+To attach the custom domain once it is registered: add `akiratran.com` in the
+Vercel project's Domains tab, then point the registrar at the records Vercel
+gives you (an `A` record for the apex, `CNAME` for `www`). Until then the
+`*.vercel.app` URL works fine.
+
+`metadataBase` in `src/app/layout.tsx` is set to `https://akiratran.com` — update
+it if the domain changes, or Open Graph URLs will point at the wrong host.

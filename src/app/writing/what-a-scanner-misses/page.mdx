@@ -1,0 +1,40 @@
+export const metadata = {
+  title: "What a scanner misses",
+  description:
+    "Dependency scanners read source. Attackers ship binaries. Notes on the gap between those two facts.",
+};
+
+<p className="text-xs text-faint">2 May 2026 · draft</p>
+
+# What a scanner misses
+
+A dependency scanner's job is to answer one question: is this safe to install?
+The honest version of that answer is usually *probably*, and the interesting
+work is in narrowing what "probably" covers.
+
+## The shape of a false negative
+
+Most scanners are very good at reading scripts. They parse the source, look for
+the patterns that indicate exfiltration or persistence or obfuscation, and
+score what they find.
+
+The gap is that a package does not have to be source. If the payload arrives as
+a compiled artefact, a scanner that only reads scripts sees a package that does
+nothing interesting and says so with confidence. The verdict is clean. The
+package is not.
+
+## Why this is hard to fix properly
+
+You cannot simply flag every dependency that ships a binary — a large fraction
+of legitimate packages do, and a scanner that cries wolf gets muted, which is
+strictly worse than one that misses things. False positives and false negatives
+are the same problem seen from two sides.
+
+## Past the direct dependency
+
+The other direction is scope. A skill's dependencies are not just the packages
+it declares. There are URLs it reaches for at runtime, and there are other
+skills it pulls in, which have their own dependencies and their own URLs.
+
+At that point the supply chain has stopped being a tree and become a graph, and
+the question "is this safe to install" is really a question about reachability.
