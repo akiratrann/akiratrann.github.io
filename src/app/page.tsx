@@ -1,69 +1,66 @@
 import Link from "next/link";
-import { Diagnostic } from "@/components/Diagnostic";
-import { featured } from "@/content/projects";
+import { EntryRow } from "@/components/Entry";
 import { person } from "@/content/cv";
-
-const stages = ["source", "ast", "ir", "wasm"];
+import { caseStudies, work } from "@/content/work";
 
 export default function Home() {
   return (
     <>
       <section>
-        {/* The compilation pipeline, used as an eyebrow: it names what the
-            work actually is before the prose does. */}
-        <div
-          className="flex flex-wrap items-center gap-2 text-xs text-faint"
-          aria-hidden="true"
-        >
-          {stages.map((stage, i) => (
-            <span key={stage} className="flex items-center gap-2">
-              <span className={i === 0 ? "text-accent" : "text-dim"}>
-                {stage}
-              </span>
-              {i < stages.length - 1 && <span>→</span>}
-            </span>
-          ))}
-        </div>
-
-        <h1 className="mt-4 font-display text-5xl font-bold leading-none tracking-tight text-bright sm:text-6xl">
+        <h1 className="font-display text-[clamp(2.75rem,6vw,3.5rem)] font-bold leading-none tracking-tight text-bright">
           {person.name}
         </h1>
 
-        <p className="mt-5 max-w-[62ch] text-muted">
-          Stanford{" "}
-          <span className="text-body">BS/MS Computer Science &rsquo;27</span>,
-          minors in Fine Arts and Music. I work on{" "}
-          <span className="text-accent">compiler internals</span> for Morphic, a
-          pure functional language, and on{" "}
-          <span className="text-accent">security research</span> at Socket.dev —
-          teaching scanners to catch the malicious code they currently miss.
+        {/* The predicate does the work the old compiler eyebrow was doing,
+            except it describes a person rather than a discipline. */}
+        <p className="mt-5 max-w-[46ch] text-xl leading-snug text-body">
+          {person.predicate}
         </p>
-        <p className="mt-3 max-w-[62ch] text-dim">
-          Off the clock I guide tours at the Cantor Arts Center and build
-          software for people who draw.
+
+        <p className="mt-4 max-w-[58ch] text-muted">
+          Compilers and malware scanners, real-time renderers and games, local
+          tooling for drawing comics — and three objects in a museum I spent a
+          year researching.
         </p>
+
+        <div className="mt-7 flex flex-col gap-1 font-mono text-xs text-dim">
+          <p>
+            Stanford <span className="text-muted">BS/MS Computer Science</span>{" "}
+            &rsquo;27 <span className="text-faint">·</span> minors in Fine Arts
+            and Music
+          </p>
+          <p className="text-muted">{person.availability}</p>
+          <p className="text-faint">
+            Updated{" "}
+            <time dateTime={person.lastUpdated}>{person.lastUpdatedLabel}</time>
+          </p>
+        </div>
       </section>
 
-      <section className="mt-14" aria-labelledby="selected">
-        <h2
-          id="selected"
-          className="text-xs uppercase tracking-[0.18em] text-faint"
-        >
-          Selected work
-        </h2>
+      <section className="mt-16" aria-labelledby="selected">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2
+            id="selected"
+            className="font-mono text-xs uppercase tracking-[0.18em] text-faint"
+          >
+            Selected work
+          </h2>
+          <p className="font-mono text-xs text-faint">
+            {caseStudies.length} of {work.length}
+          </p>
+        </div>
 
-        <div className="mt-2">
-          {featured.map((project) => (
-            <Diagnostic key={project.slug} project={project} />
+        <div className="mt-4">
+          {caseStudies.map((entry) => (
+            <EntryRow key={entry.slug} entry={entry} />
           ))}
         </div>
 
         <Link
           href="/work"
-          className="mt-6 inline-block text-dim transition-colors hover:text-accent"
+          className="mt-8 inline-block font-mono text-sm text-dim underline decoration-hair underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
         >
-          <span aria-hidden="true">$ </span>
-          see all work
+          Everything else — {work.length} entries
         </Link>
       </section>
     </>

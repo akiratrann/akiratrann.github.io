@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Archivo } from "next/font/google";
 import Link from "next/link";
 import { person } from "@/content/cv";
+import { publishedPosts } from "@/content/posts";
 import "./globals.css";
 
 const jetbrains = JetBrains_Mono({
@@ -11,15 +12,28 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+// 400/500 carry running prose, 600/700 carry headings. next/font self-hosts
+// these at build time, so there is no font CDN at runtime.
 const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
+/*
+  akiratran.com is not registered yet, so the canonical host comes from the
+  environment and falls back to the Vercel deployment. Set
+  NEXT_PUBLIC_SITE_URL once the domain is live; nothing else needs touching.
+*/
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://akiratran.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: `${person.name} — ${person.tagline}`,
     template: `%s — ${person.name}`,
@@ -28,17 +42,23 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${person.name} — ${person.tagline}`,
     description: person.blurb,
-    url: "https://akiratran.com",
+    url: siteUrl,
     siteName: person.name,
     type: "website",
   },
   twitter: { card: "summary_large_image" },
 };
 
+/*
+  Writing only appears once something is actually published — a nav item that
+  leads to "nothing published yet" costs more than the missing link does.
+  Flip a post's `draft` to false in content/posts.ts and it returns by itself.
+*/
 const nav = [
-  { href: "/", label: "~" },
   { href: "/work", label: "work" },
-  { href: "/writing", label: "writing" },
+  ...(publishedPosts.length > 0
+    ? [{ href: "/writing", label: "writing" }]
+    : []),
   { href: "/cv", label: "cv" },
 ];
 
@@ -59,12 +79,12 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4">
             <Link
               href="/"
-              className="text-dim transition-colors hover:text-bright"
+              className="font-mono text-sm text-dim transition-colors hover:text-bright"
             >
-              akira-tran
+              {person.name}
             </Link>
-            <nav className="flex gap-5" aria-label="Main">
-              {nav.slice(1).map((item) => (
+            <nav className="flex gap-5 font-mono text-sm" aria-label="Main">
+              {nav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -82,7 +102,7 @@ export default function RootLayout({
         </main>
 
         <footer className="border-t border-hair">
-          <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-6 py-5 text-xs text-dim">
+          <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-6 py-5 font-mono text-xs text-dim">
             <a
               href={`mailto:${person.email}`}
               className="transition-colors hover:text-accent"
@@ -100,7 +120,7 @@ export default function RootLayout({
                 href={person.linkedin}
                 className="transition-colors hover:text-accent"
               >
-                linkedin
+                {person.linkedinHandle}
               </a>
             </div>
           </div>

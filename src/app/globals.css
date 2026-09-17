@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 /*
-  Diagnostic — the palette borrows a compiler's error output rather than a
-  generic dark theme. Ground is ink-blue rather than neutral black; the accent
-  is sodium ochre (the colour of a `warning:` line), not the usual acid green.
-  Severity colours are separate from the accent and only ever mark severity.
+  Ground is ink-blue rather than neutral black, so the accent has something
+  cool to sit against. The accent is a jade green picked to lean cyan with the
+  ground rather than fight it — deliberately not terminal-phosphor green.
+  Severity colours are separate from the accent and only ever mark severity:
+  the accent must never be read as "this one is fine".
 */
 @theme {
   --color-ground: #0d1014;
@@ -20,15 +21,16 @@
   --color-dim: #5d6873;
   --color-faint: #38424d;
 
-  --color-accent: #d99a2b;
-  --color-accent-soft: #8a6520;
+  --color-accent: #5fc98d;
+  --color-accent-soft: #2e6b4e;
 
   --color-note: #8fa8bc;
-  --color-string: #7fa88c;
+  --color-warning: #d9764a;
   --color-error: #d4635c;
 
   --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", Menlo, monospace;
   --font-display: var(--font-archivo), "Helvetica Neue", Helvetica, sans-serif;
+  --font-prose: var(--font-archivo), "Helvetica Neue", Helvetica, sans-serif;
 }
 
 html {
@@ -45,14 +47,25 @@ html {
   }
 }
 
+/*
+  Prose is set in the text face; monospace is reserved for metadata, dates,
+  status, stack and code, where the fixed advance is doing real work. Running
+  prose in mono is the single loudest "student portfolio" signal there is.
+*/
 body {
   background: var(--color-ground);
   color: var(--color-body);
-  font-family: var(--font-mono);
-  font-size: 13.5px;
-  line-height: 1.65;
+  font-family: var(--font-prose);
+  font-size: 17px;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Mono runs optically larger than the text face, so pull it back wherever
+   the two sit side by side. */
+.font-mono {
+  font-size: 0.9em;
 }
 
 /* Keyboard focus must stay visible against the ink ground. */

@@ -4,11 +4,25 @@ export const person = {
   github: "https://github.com/akiratrann",
   githubHandle: "github.com/akiratrann",
   linkedin: "https://www.linkedin.com/in/akira-pa-tran",
-  linkedinHandle: "linkedin.com/in/akira-pa-tran",
+  /* Written out in full, the way the résumé header prints it. */
+  linkedinHandle: "https://www.linkedin.com/in/akira-pa-tran",
   site: "akiratran.com",
-  tagline: "Compilers, security, and tools for making things.",
+  tagline: "Compilers, renderers, scanners, games, and comics.",
+  /*
+    One predicate, then domains chosen to be as far apart as possible. The
+    range has to be visible in the first line or the reader files him under
+    whichever discipline he names first.
+  */
+  predicate:
+    "I build the machinery behind things other people look at.",
   blurb:
-    "Stanford BS/MS Computer Science '27, minors in Fine Arts and Music. I work on compiler internals for Morphic, a pure functional language, and on security research at Socket.dev — teaching scanners to catch the malicious code they currently miss. Off the clock I guide tours at the Cantor Arts Center and build software for people who draw.",
+    "Stanford BS/MS Computer Science '27, minors in Fine Arts and Music. I build compilers and malware scanners, real-time renderers and games, and local tooling for drawing comics — and I research objects for the Cantor Arts Center.",
+  availability:
+    "Seeking summer 2027 research or internship — programming languages, security, or graphics.",
+  /* Bump both when the content changes; a stale freshness line is worse
+     than none, so this is deliberately manual rather than build-time. */
+  lastUpdated: "2026-08-26",
+  lastUpdatedLabel: "August 2026",
 };
 
 export const education = {

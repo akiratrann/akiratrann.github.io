@@ -1,97 +1,108 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { projects, projectBySlug } from "@/content/projects";
+import { caseStudies, findEntry } from "@/content/work";
 
 type Params = { params: Promise<{ slug: string }> };
 
+// Only case studies get a page; every other entry is a one-liner in the index.
 export function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }));
+  return caseStudies.map((e) => ({ slug: e.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const project = projectBySlug(slug);
-  if (!project) return {};
-  return { title: project.name, description: project.headline };
+  const entry = findEntry(slug);
+  if (!entry) return {};
+  return { title: entry.name, description: entry.summary };
 }
 
-function Meta({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-3">
-      <dt className="w-20 shrink-0 text-faint">{label}</dt>
+      <dt className="w-16 shrink-0 text-faint">{label}</dt>
       <dd className="text-body">{children}</dd>
     </div>
   );
 }
 
-export default async function ProjectPage({ params }: Params) {
+export default async function EntryPage({ params }: Params) {
   const { slug } = await params;
-  const project = projectBySlug(slug);
-  if (!project) notFound();
-
-  const index = projects.findIndex((p) => p.slug === slug);
-  const next = projects[index + 1];
+  const entry = findEntry(slug);
+  if (!entry || entry.depth !== "case-study") notFound();
 
   return (
     <article>
       <Link
         href="/work"
-        className="text-xs text-dim transition-colors hover:text-accent"
+        className="font-mono text-xs text-dim transition-colors hover:text-accent"
       >
-        <span aria-hidden="true">← </span>work
+        <span aria-hidden="true">← </span>
+        work
       </Link>
 
-      <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight text-bright">
-        {project.name}
+      <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-bright">
+        {entry.name}
       </h1>
-      <p className="mt-3 max-w-[62ch] text-muted">{project.headline}</p>
 
-      <dl className="mt-7 space-y-1.5 border-y border-hair py-5 text-[13px]">
-        <Meta label="stack">{project.stack.join(" · ")}</Meta>
-        <Meta label="context">{project.context}</Meta>
-        <Meta label="year">{project.year}</Meta>
-        <Meta label="source">
-          {project.repo ? (
+      <p className="mt-3 max-w-[52ch] text-xl leading-snug text-body">
+        {entry.summary}
+      </p>
+
+      <dl className="mt-8 flex flex-col gap-2 border-y border-hair py-5 font-mono text-xs">
+        <Field label="role">{entry.role}</Field>
+        <Field label="with">{entry.with}</Field>
+        <Field label="when">
+          <span className="tabular-nums">{entry.year}</span>
+          <span className="text-faint"> · </span>
+          <span className="text-muted">{entry.status}</span>
+        </Field>
+        {entry.stack && <Field label="stack">{entry.stack.join(" · ")}</Field>}
+        <Field label="also">{entry.also.join(" · ")}</Field>
+        <Field label="source">
+          {entry.repo ? (
             <a
-              href={project.repo}
+              href={entry.repo}
               className="text-accent underline decoration-accent-soft underline-offset-4 transition-colors hover:decoration-accent"
             >
-              {project.repo.replace("https://github.com/", "")}
+              {entry.repo.replace("https://", "")}
             </a>
           ) : (
-            <span className="text-faint">
-              not public — {project.context.includes("Socket") || project.context.includes("Aiken")
-                ? "research code"
-                : "private repository"}
-            </span>
+            <span className="text-dim">not public — research code</span>
           )}
-        </Meta>
+        </Field>
       </dl>
 
-      <div className="mt-8 space-y-5">
-        {project.body.map((para, i) => (
-          <p key={i} className="max-w-[68ch] leading-[1.75] text-body">
-            {para}
-          </p>
+      <div className="mt-8 flex max-w-[68ch] flex-col gap-5 text-body">
+        {entry.body?.map((paragraph) => (
+          <p key={paragraph.slice(0, 40)}>{paragraph}</p>
         ))}
       </div>
 
-      <p className="mt-10 text-dim">
-        <span className="text-note">help</span>: {project.help}
-      </p>
+      {entry.media?.length ? (
+        <div className="mt-10 flex flex-col gap-6">
+          {entry.media.map((m) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={m.src}
+              src={m.src}
+              alt={m.alt}
+              width={m.width}
+              height={m.height}
+              loading="lazy"
+              className="w-full rounded border border-hair"
+            />
+          ))}
+        </div>
+      ) : null}
 
-      {next && (
-        <nav className="mt-12 border-t border-hair pt-5">
-          <Link
-            href={`/work/${next.slug}`}
-            className="text-dim transition-colors hover:text-accent"
-          >
-            next: {next.name}
-            <span aria-hidden="true"> →</span>
-          </Link>
-        </nav>
-      )}
+      <Link
+        href="/work"
+        className="mt-12 inline-block font-mono text-xs text-dim transition-colors hover:text-accent"
+      >
+        <span aria-hidden="true">← </span>
+        all work
+      </Link>
     </article>
   );
 }
