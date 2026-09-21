@@ -33,6 +33,8 @@ export type Entry = {
   demo?: string;
   /** Case studies get a detail page; entries are one-liners. */
   depth: "case-study" | "entry";
+  /** Surfaced on the home page. Keep this to a handful that triangulate. */
+  featured?: boolean;
   body?: string[];
   /** Interactive demos rendered on the detail page, keyed into the registry. */
   interactive?: DemoKey[];
@@ -85,6 +87,7 @@ export const work: Entry[] = [
       "A foreign-function protocol for a pure functional language, drawn from the C ABI and the Rust–C FFI.",
     also: ["static analysis", "AST transformation", "ABI design"],
     stack: ["Rust", "WebAssembly", "LLVM"],
+    featured: true,
     depth: "case-study",
     interactive: ["compiler-pipeline"],
     body: [
@@ -149,6 +152,7 @@ export const work: Entry[] = [
       "Finding the cases where a malware scanner says clean and is wrong — particularly dependencies that arrive as binaries rather than source.",
     also: ["static analysis", "binary inspection", "adversarial testing"],
     stack: ["Python", "Binary analysis", "Supply-chain security"],
+    featured: true,
     depth: "case-study",
     interactive: ["scanner-evasion"],
     body: [
@@ -171,6 +175,7 @@ export const work: Entry[] = [
       "Elemental auras tracked as decaying gauges rather than flags, in a game whose committed scene is 181 lines of YAML holding a single GameObject.",
     also: ["cel-shading / NPR", "runtime construction", "systems maths"],
     stack: ["Unity 6", "C#", "HLSL"],
+    featured: true,
     depth: "case-study",
     interactive: ["elemental-sandbox", "cel-shading"],
     body: [
@@ -195,6 +200,7 @@ export const work: Entry[] = [
     also: ["cel-shading / NPR", "3D blockout", "pipeline orchestration"],
     stack: ["Python", "Blender", "ComfyUI"],
     repo: "https://github.com/akiratrann/manhwa-studio",
+    featured: true,
     depth: "case-study",
     interactive: ["pipeline-stepper"],
     body: [
@@ -236,7 +242,13 @@ export const work: Entry[] = [
     also: ["cel-shading / NPR", "colour quantization"],
     stack: ["C++", "OpenGL", "GLSL"],
     repo: "https://github.com/akiratrann/cs248a_asst4_Stylized_Shading",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["stylized-shading"],
+    body: [
+      "Assignment 4 of Stanford's interactive computer graphics course: take a rendered frame and stylize it, in real time, without the result looking like a filter.",
+      "It implements eight passes — cel quantization, Sobel outlines, a three-tone palette with a rim built from the shadow mask, halftone, Kuwahara smoothing, Gooch cool-to-warm shading, and a watercolour pass — each with its own parameters, and most of the interest is in how they compose rather than in any one of them.",
+      "The cel pass here and the one in Aetherion solve the same problem from opposite ends: this quantizes luminance after the image exists, while the game's shader bands the lighting term before anything is shaded. Comparing them is the clearest way to see what non-photorealistic rendering actually is.",
+    ],
   },
 
   // ---- Studies & scripts ----------------------------------------------
@@ -314,7 +326,12 @@ export const work: Entry[] = [
     also: ["speech interfaces", "translation", "grammar analysis"],
     stack: ["TypeScript", "Speech", "Translation"],
     repo: "https://github.com/akiratrann/lingobridge",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["grammar-breakdown"],
+    body: [
+      "A translator built around a physical act: you say your piece, then hand the phone to a stranger and they answer into it. The reply comes back translated and split word by word, with the grammar explained, so you leave the conversation knowing something you did not before.",
+      "The interesting engineering is the handover state machine — compose, speak, hand over, listen, reply, breakdown — and the JSON Schema that holds the model's output in shape. That schema is the contract between a language model and a UI that has to render reliably; it is the part that makes the word-by-word view possible at all.",
+    ],
   },
   {
     slug: "pocket-planet",
@@ -329,7 +346,12 @@ export const work: Entry[] = [
     also: ["source mining", "ranking", "citation"],
     stack: ["TypeScript", "OpenStreetMap"],
     repo: "https://github.com/akiratrann/pocket-planet",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["source-ranking"],
+    body: [
+      "A travel guide that mines and cites rather than inventing. Recommendations are drawn from Wikivoyage, OpenStreetMap, Lonely Planet, YouTube, Travel Stack Exchange and Reddit, and ranked by how strongly those sources agree with each other.",
+      "The ranking is the product. A place earns merit from how many independent publishers mention it, how many Wikipedia language editions carry it, and what heritage designations it holds — with a hard penalty for civic names that look like attractions but are not. Turning a source off reorders the list, which is the point: the consensus is auditable rather than asserted.",
+    ],
   },
   {
     slug: "alter-grab",
@@ -376,6 +398,10 @@ export const work: Entry[] = [
 ];
 
 export const caseStudies = work.filter((e) => e.depth === "case-study");
+
+/* The home page shows these, not every case study — a selection stops being
+   one the moment it lists everything. */
+export const featured = work.filter((e) => e.featured);
 
 export function byForm(form: Form) {
   return work.filter((e) => e.form === form);

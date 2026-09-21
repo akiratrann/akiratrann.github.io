@@ -3,13 +3,16 @@ import { ElementalSandbox } from "@/components/ElementalSandbox";
 import { CelShading } from "@/components/demos/CelShading";
 import { CompilerPipeline } from "@/components/demos/CompilerPipeline";
 import { FareBreakdown } from "@/components/demos/FareBreakdown";
+import { GrammarBreakdown } from "@/components/demos/GrammarBreakdown";
 import { NodeGraphTranslator } from "@/components/demos/NodeGraphTranslator";
 import { PipelineStepper } from "@/components/demos/PipelineStepper";
 import { ProductMatcher } from "@/components/demos/ProductMatcher";
 import { PromptAssembly } from "@/components/demos/PromptAssembly";
 import { ReceiptSplitter } from "@/components/demos/ReceiptSplitter";
 import { ScannerEvasion } from "@/components/demos/ScannerEvasion";
+import { SourceRanking } from "@/components/demos/SourceRanking";
 import { StrategyBacktest } from "@/components/demos/StrategyBacktest";
+import { StylizedShading } from "@/components/demos/StylizedShading";
 
 /*
   Interactive demos, keyed so an entry in content/work.ts can list the ones it
@@ -22,24 +25,30 @@ export type DemoKey =
   | "cel-shading"
   | "compiler-pipeline"
   | "fare-breakdown"
+  | "grammar-breakdown"
   | "node-graph"
   | "pipeline-stepper"
   | "product-matcher"
   | "prompt-assembly"
   | "receipt-splitter"
   | "scanner-evasion"
-  | "strategy-backtest";
+  | "source-ranking"
+  | "strategy-backtest"
+  | "stylized-shading";
 
 export const demos: Record<DemoKey, ComponentType> = {
   "elemental-sandbox": ElementalSandbox,
   "cel-shading": CelShading,
   "compiler-pipeline": CompilerPipeline,
   "fare-breakdown": FareBreakdown,
+  "grammar-breakdown": GrammarBreakdown,
   "node-graph": NodeGraphTranslator,
   "pipeline-stepper": PipelineStepper,
   "product-matcher": ProductMatcher,
   "prompt-assembly": PromptAssembly,
   "receipt-splitter": ReceiptSplitter,
   "scanner-evasion": ScannerEvasion,
+  "source-ranking": SourceRanking,
   "strategy-backtest": StrategyBacktest,
+  "stylized-shading": StylizedShading,
 };

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { EntryRow } from "@/components/Entry";
 import { person } from "@/content/cv";
-import { caseStudies, work } from "@/content/work";
+import { featured, work } from "@/content/work";
 
 export default function Home() {
   return (
@@ -46,12 +46,12 @@ export default function Home() {
             Selected work
           </h2>
           <p className="font-mono text-xs text-faint">
-            {caseStudies.length} of {work.length}
+            {featured.length} of {work.length}
           </p>
         </div>
 
         <div className="mt-4">
-          {caseStudies.map((entry) => (
+          {featured.map((entry) => (
             <EntryRow key={entry.slug} entry={entry} />
           ))}
         </div>

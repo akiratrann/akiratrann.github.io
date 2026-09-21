@@ -59,8 +59,14 @@ export function EntryRow({ entry }: { entry: Entry }) {
   return (
     <article className="border-t border-hair-soft py-5 first:border-t-0">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h3 className="font-prose text-lg font-semibold leading-snug">
+        <h3 className="flex flex-wrap items-baseline gap-2 font-prose text-lg font-semibold leading-snug">
           {title}
+          {/* Signals there is something to actually use, not just read. */}
+          {!!entry.interactive?.length && (
+            <span className="rounded-sm border border-accent px-1.5 py-0.5 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-accent">
+              playable
+            </span>
+          )}
         </h3>
         <Meta entry={entry} />
       </div>
@@ -90,12 +96,21 @@ export function EntryRow({ entry }: { entry: Entry }) {
         </div>
       </dl>
 
-      {(entry.repo || linked) && (
+      {(entry.repo || linked || !!entry.interactive?.length) && (
         <div className="mt-3 flex flex-wrap gap-4 font-mono text-xs">
+          {/* Deep-link past the prose to the thing you can touch. */}
+          {!!entry.interactive?.length && (
+            <Link
+              href={`/work/${entry.slug}#try`}
+              className="text-accent underline decoration-accent-soft underline-offset-4 transition-colors hover:decoration-accent"
+            >
+              try it
+            </Link>
+          )}
           {linked && (
             <Link
               href={`/work/${entry.slug}`}
-              className="text-accent underline decoration-accent-soft underline-offset-4 transition-colors hover:decoration-accent"
+              className="text-dim underline decoration-hair underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
             >
               read more
             </Link>

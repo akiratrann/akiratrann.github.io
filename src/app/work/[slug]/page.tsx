@@ -80,10 +80,14 @@ export default async function EntryPage({ params }: Params) {
         ))}
       </div>
 
-      {entry.interactive?.map((key) => {
-        const Demo = demos[key];
-        return <Demo key={key} />;
-      })}
+      {!!entry.interactive?.length && (
+        <div id="try" className="scroll-mt-20">
+          {entry.interactive.map((key) => {
+            const Demo = demos[key];
+            return <Demo key={key} />;
+          })}
+        </div>
+      )}
 
       {entry.media?.length ? (
         <div className="mt-10 flex flex-col gap-6">
