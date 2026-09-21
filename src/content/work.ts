@@ -9,6 +9,8 @@
   reader notices rather than something the bio claims.
 */
 
+import type { DemoKey } from "@/components/demos/registry";
+
 export type Form = "language" | "adversarial" | "world" | "study" | "app";
 export type Status = "active" | "shipped" | "archived";
 
@@ -32,6 +34,8 @@ export type Entry = {
   /** Case studies get a detail page; entries are one-liners. */
   depth: "case-study" | "entry";
   body?: string[];
+  /** Interactive demos rendered on the detail page, keyed into the registry. */
+  interactive?: DemoKey[];
   /**
    * Screen captures. Nothing is listed until a real capture exists — the
    * visual work should be shown, not described, but not with a placeholder.
@@ -82,10 +86,11 @@ export const work: Entry[] = [
     also: ["static analysis", "AST transformation", "ABI design"],
     stack: ["Rust", "WebAssembly", "LLVM"],
     depth: "case-study",
+    interactive: ["compiler-pipeline"],
     body: [
       "Morphic is a pure functional language developed in Alex Aiken's research group at Stanford. I work on the parts of it that decide whether anyone else can actually use it: the debugging output, the WebAssembly backend, and a foreign-function interface.",
       "The FFI is the current work. The goal is a protocol that can bridge between any imperative or functional language, rather than one pairing at a time. It takes its shape from the C ABI and from the Rust–C FFI, both of which solved a narrower version of the same problem.",
-      "Before that I modified all twenty-five of the compiler's abstract syntax tree structures to emit debugging output. A pure functional compiler that cannot show you its own intermediate state is very hard to develop against, and that was the blocker for day-to-day use.",
+      "Before that I worked across all twenty-five data modules in the compiler's common crate so the intermediate representations could emit debugging output, and eleven pretty-printers now cover thirteen of the pipeline's stages, eight of which dump an artifact you can diff between runs. A pure functional compiler that cannot show you its own intermediate state is very hard to develop against, and that was the blocker for day-to-day use.",
       "On the WebAssembly side I fixed targeting, entry-point naming, runtime linking, and a symbol table issue that prevented compilation from completing.",
     ],
   },
@@ -102,7 +107,13 @@ export const work: Entry[] = [
     also: ["agent orchestration", "edge runtime"],
     stack: ["TypeScript", "Cloudflare Workers", "Durable Objects"],
     repo: "https://github.com/akiratrann/cloudflare-code-assistant",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["prompt-assembly"],
+    body: [
+      "An agentic coding assistant that runs on Cloudflare's edge. The Worker is the orchestration layer: it holds the prompts, calls Workers AI, reads and writes KV for memory and collaboration, and serves the editor. Prompts and secrets never reach the browser.",
+      "The part worth showing is project handoff. When you open a project someone shared with you, your chat panel is empty — but the Worker injects the original owner's conversation into the system prompt as read-only context. You can ask why a function is written the way it is and get an answer grounded in a discussion you were never part of.",
+      "Most assistants treat chat as disposable and per-user. Here the reasoning behind a codebase travels with the code. Sharing is addressed to a username with separate incoming and outgoing indexes, so there is no public link to guess.",
+    ],
   },
   {
     slug: "robinhoodbot",
@@ -116,7 +127,13 @@ export const work: Entry[] = [
       "A rules engine for equities and crypto across three brokerages, with backtesting, walk-forward validation and hard risk halts.",
     also: ["backtesting", "risk control", "time-series"],
     stack: ["Python", "Alpaca", "Schwab"],
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["strategy-backtest"],
+    body: [
+      "A rules engine that trades equities and crypto across three brokerages. The interesting half is not the trading, it is the machinery that stops a strategy fooling you: a backtest harness, walk-forward validation, and risk gates that halt the engine rather than trusting a rule to behave.",
+      "The strategy in the demo is the real one — slope reversal, with the engine's own exit gates layered on: a maximum holding period that forces an exit after N days, a cooldown that blocks immediate re-entry into a symbol just sold, and a never-sell-at-loss rule that refuses to realise a losing position.",
+      "That last gate is the one worth arguing about. It guarantees every completed sale is a win, which flatters the win rate and quietly converts losses into positions held indefinitely. The backtest shows both numbers so the tradeoff is visible rather than hidden.",
+    ],
   },
 
   // ---- Adversarial work -----------------------------------------------
@@ -133,6 +150,7 @@ export const work: Entry[] = [
     also: ["static analysis", "binary inspection", "adversarial testing"],
     stack: ["Python", "Binary analysis", "Supply-chain security"],
     depth: "case-study",
+    interactive: ["scanner-evasion"],
     body: [
       "Socket scans AI skills for malicious behaviour. My work is the adversarial half: finding the cases where the scanner says clean and is wrong, and the cases where it cries wolf.",
       "The most productive seam has been dependencies that arrive as binaries rather than source. A scanner that only reads scripts will approve a package whose actual payload is compiled. Improving detection there moved the scanner's accuracy past both Snyk's and GenTrustHub's on the same corpus.",
@@ -150,14 +168,18 @@ export const work: Entry[] = [
     status: "active",
     year: "2025 —",
     summary:
-      "An action-RPG vertical slice whose entire world, party and HUD are constructed at runtime from code — no prefabs, no scene wiring.",
+      "Elemental auras tracked as decaying gauges rather than flags, in a game whose committed scene is 181 lines of YAML holding a single GameObject.",
     also: ["cel-shading / NPR", "runtime construction", "systems maths"],
     stack: ["Unity 6", "C#", "HLSL"],
     depth: "case-study",
+    interactive: ["elemental-sandbox", "cel-shading"],
     body: [
-      "An open-world action-RPG vertical slice, built around the systems that make the genre work rather than around its art: elemental reactions, a four-character party you swap between mid-combo, climb/glide/swim traversal gated by stamina, artifact and gacha progression, and a cel-shaded look.",
-      "The constraint that shaped it: no art assets and no scene wiring. The whole world, the party, and the HUD are constructed at runtime from code. Nothing is authored in the Unity editor, which means the entire game is reviewable as a diff.",
-      "That choice costs you the editor's conveniences and buys you a game whose behaviour is fully determined by source. It also made the systems work — damage formulas, reaction tables, gacha rates — testable without launching anything.",
+      "An action-RPG vertical slice. The elemental maths you can transcribe from a wiki; what taught me something was ownership of mutable state across character swaps, cancels and pause menus.",
+      "Auras are gauges rather than flags. A hit banks 80% of its declared units but derives decay from the declared value — U / (2.5U + 7) per second — so 1U, 2U and 4U applications live 7.6s, 9.6s and 13.6s. Freeze sits above that stack as its own shell, with its thaw rate latched at the moment of freezing; recomputing it per frame as the gauge shrank made freeze decelerate and stretched a 2U/2U pairing to roughly 23 seconds.",
+      "Most of the hard bugs were ownership bugs, and the comments in the source are post-mortems. Hit-stop owns a single global flag rather than capturing Time.timeScale, because a swap inside the 45ms window left the game stuck at 5% speed with no way back. Cooldowns charge before the cast wait, because committing them after let a swap-cancel refund the whole ability and keep the i-frames. Two components each assigning maxHP — one pre-resonance, one post — silently drained about 9% of HP on every swap.",
+      "Off-field abilities snapshot the caster's resolved stats when they spawn but still forward damage feedback to the live actor. Before that, an Electro turret ticking after you swapped away scaled off whichever character was now on field, which made off-field characters impossible to build.",
+      "The whole world, party and HUD are constructed at runtime: the committed scene is 181 lines of YAML holding one GameObject. There are no prefabs, no meshes and no texture assets — every visible object is a Unity primitive under two hand-written URP cel shaders. Adding URP/Lit to Always Included Shaders took the build from 295 shader variants to 294,912, which is why only my own two are registered.",
+      "It is a systems demo in programmer geometry: no art, no audio, no save file.",
     ],
   },
   {
@@ -174,6 +196,7 @@ export const work: Entry[] = [
     stack: ["Python", "Blender", "ComfyUI"],
     repo: "https://github.com/akiratrann/manhwa-studio",
     depth: "case-study",
+    interactive: ["pipeline-stepper"],
     body: [
       "An end-to-end manhwa production tool. Characters and art styles go in; storyboarded and lettered vertical-scroll chapters come out.",
       "The pipeline runs storyline into scenes, scenes into panels, panels into a 3D blockout in Blender, the blockout into panel art through a local ComfyUI graph, then lettering and export to a webtoon strip.",
@@ -193,7 +216,12 @@ export const work: Entry[] = [
     also: ["diffusion pipelines", "async job APIs", "pipeline orchestration"],
     stack: ["Python", "FastAPI", "ComfyUI"],
     repo: "https://github.com/akiratrann/twoshot",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["node-graph"],
+    body: [
+      "A local anime image generator. ComfyUI does the diffusion; a small FastAPI service in front of it turns flat JSON requests into ComfyUI node graphs and exposes them as async jobs.",
+      "That split is the whole bet. The API is the part you would keep and deploy; ComfyUI is a worker you can later move to a cloud GPU without changing a line of the app. The translation from a flat request to a wired graph is where the work actually lives, so that is what the demo shows.",
+    ],
   },
   {
     slug: "stylized-shading",
@@ -266,7 +294,12 @@ export const work: Entry[] = [
     also: ["offline-first", "local storage", "PWA"],
     stack: ["Next.js", "TypeScript"],
     repo: "https://github.com/akiratrann/payback",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["receipt-splitter"],
+    body: [
+      "Photograph a receipt, tap who had what, and send everyone a prefilled payment request. No accounts, no fees, no backend — every bill lives in your browser's local storage, and it installs to the home screen on iOS.",
+      "The arithmetic is fussier than it looks. Shared items divide proportionally, tax and tip are apportioned by each person's share of the subtotal, and the rounding has to sum back to the bill exactly — so the remainder cent has to land somewhere deliberate rather than being dropped.",
+    ],
   },
   {
     slug: "lingobridge",
@@ -307,11 +340,17 @@ export const work: Entry[] = [
     status: "shipped",
     year: "2025",
     summary:
-      "10% on rides and 12% on food against an industry 20–30%, with an itemised fare breakdown shown to both riders and drivers.",
+      "A 15% ride commission against an industry 25%, with the fare itemised for the driver as well as the rider — and the card-processing fee absorbed rather than passed on.",
     also: ["marketplace pricing", "fare transparency"],
     stack: ["TypeScript", "React Native"],
     repo: "https://github.com/akiratrann/alter_grab",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["fare-breakdown"],
+    body: [
+      "A ride-hailing and delivery app built around one bet: that transparency is the feature. Effective take rates at the incumbents run 25% and upward, and the fare a driver actually receives is rarely shown to them in parts.",
+      "The engine commissions 15% on rides and 18% on a merchant's items total, and the itemised breakdown is rendered for both sides. Surge multiplies the metered portion only — never the booking fee — and the minimum fare is applied afterwards as a floor on the gross. On food, the courier keeps the delivery fee and the whole tip; neither is ever commissioned.",
+      "Card processing is absorbed by the platform rather than passed through. That is a real cost, not a rounding detail: on a minimum-fare bike trip the fixed processing fee outruns the commission it comes out of and the platform runs the trip at a loss, while the driver's payout is untouched. The demo surfaces that row, because a pricing thesis you cannot audit is just marketing.",
+    ],
   },
   {
     slug: "betterbasket-product-matching",
@@ -326,7 +365,13 @@ export const work: Entry[] = [
     also: ["nearest-neighbour matching", "embeddings", "record linkage"],
     stack: ["Python", "Embeddings"],
     repo: "https://github.com/akiratrann/betterbasket-product-matching",
-    depth: "entry",
+    depth: "case-study",
+    interactive: ["product-matcher"],
+    body: [
+      "Take every product in one grocery store — Walmart, around 233,000 items — and find its closest counterpart in another, Wegmans, at about 55,000. Closest covers two different problems: the same national-brand product appearing in both, and the private-label or fresh item a shopper would happily swap for it.",
+      "It runs as a funnel rather than one big similarity score. Cheap blocking narrows the candidate set, lexical and TF-IDF features rank what survives, size and unit strings are normalised so a 12 oz bag and a 340 g bag can meet, and only the genuinely ambiguous pairs reach the expensive adjudication stage.",
+      "Once the links exist, prices compare like for like — which is the entire point, and the reason a bad match is worse than no match.",
+    ],
   },
 ];
 

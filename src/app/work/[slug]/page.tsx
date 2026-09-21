@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { demos } from "@/components/demos/registry";
 import { caseStudies, findEntry } from "@/content/work";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -78,6 +79,11 @@ export default async function EntryPage({ params }: Params) {
           <p key={paragraph.slice(0, 40)}>{paragraph}</p>
         ))}
       </div>
+
+      {entry.interactive?.map((key) => {
+        const Demo = demos[key];
+        return <Demo key={key} />;
+      })}
 
       {entry.media?.length ? (
         <div className="mt-10 flex flex-col gap-6">
